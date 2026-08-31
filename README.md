@@ -1,5 +1,9 @@
 # ElevenLabs Lite Caption Maker
 
+Forked Repo from https://github.com/jasonbritton12
+and then made some edits.
+
+
 Upload an audio file to **ElevenLabs Speech-to-Text (Scribe)**, monitor a batch
 queue, and collect transcript deliverables (SRT / VTT / DOCX). Ships as a
 lightweight macOS desktop app and a public browser wrapper over a **reusable,
