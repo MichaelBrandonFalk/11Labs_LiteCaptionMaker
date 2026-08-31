@@ -12,6 +12,8 @@ from pathlib import Path
 
 from PyInstaller.utils.hooks import collect_data_files
 
+from elevenlabs_helper import __version__
+
 ROOT = Path(os.getcwd())
 
 # V1 bundles no external binaries (no FFmpeg) — uploads audio as-is.
@@ -59,7 +61,8 @@ app = BUNDLE(
     icon=None,
     bundle_identifier="com.elevenlabshelper.app",
     info_plist={
-        "CFBundleShortVersionString": "0.1.0",
+        "CFBundleShortVersionString": __version__,
+        "CFBundleVersion": __version__,
         "NSHighResolutionCapable": True,
     },
 )

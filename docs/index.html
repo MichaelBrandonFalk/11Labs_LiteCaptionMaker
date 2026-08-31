@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ElevenLabs Lite Caption Maker</title>
+    <meta name="description" content="Mac app and browser tool for generating SRT, VTT, DOCX, and JSON transcripts with ElevenLabs Scribe.">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="brand">ElevenLabs Lite Caption Maker</div>
+        <div class="nav-links">
+          <a href="#browser">Browser tool</a>
+          <a href="#downloads">Downloads</a>
+          <a href="#docs">Docs</a>
+          <a href="https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker">GitHub</a>
+        </div>
+      </nav>
+      <div class="hero">
+        <div>
+          <h1>Make captions with ElevenLabs Scribe without opening Terminal.</h1>
+          <p class="lead">
+            Upload a ready-to-use MP3, send it to ElevenLabs Speech-to-Text with your own API key,
+            and collect SRT, VTT, DOCX, and JSON transcript deliverables.
+          </p>
+          <div class="actions">
+            <a class="button" href="#browser">Use in browser</a>
+            <a class="button secondary" href="#downloads">Download Mac app</a>
+          </div>
+        </div>
+        <aside class="hero-panel">
+          <h2>V1 Scope</h2>
+          <ul>
+            <li>Ready-to-upload <code>.mp3</code> files only.</li>
+            <li>No FFmpeg conversion or video input yet.</li>
+            <li>Sequential desktop queue for repeat local use.</li>
+            <li>Browser mode keeps your key in memory only.</li>
+          </ul>
+        </aside>
+      </div>
+    </header>
+
+    <main>
+      <section id="browser">
+        <div class="tool-panel">
+          <h2>Browser Caption Maker</h2>
+          <p>
+            This page runs locally in your browser and calls ElevenLabs directly. It does not store your API key.
+            If your browser blocks the direct API request, use the Mac app or CLI release instead.
+          </p>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="apiKey">ElevenLabs API key</label>
+              <input id="apiKey" type="password" autocomplete="off" placeholder="sk_...">
+            </div>
+            <div class="field">
+              <label for="language">Language code</label>
+              <input id="language" type="text" placeholder="Auto-detect">
+            </div>
+            <div class="field">
+              <label for="numSpeakers">Speaker count</label>
+              <input id="numSpeakers" type="number" min="1" max="32" placeholder="Auto">
+            </div>
+            <div class="field">
+              <label for="model">Model</label>
+              <select id="model">
+                <option value="scribe_v2">scribe_v2</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="checks" aria-label="Transcription options">
+            <label><input id="diarize" type="checkbox" checked> Diarize speakers</label>
+            <label><input id="tagEvents" type="checkbox" checked> Tag audio events</label>
+            <label><input id="srt" type="checkbox" checked> SRT</label>
+            <label><input id="vtt" type="checkbox" checked> VTT</label>
+            <label><input id="docx" type="checkbox" checked> DOCX</label>
+            <label><input id="json" type="checkbox"> JSON</label>
+          </div>
+
+          <div id="dropZone" class="drop-zone">
+            <div>
+              <strong>Drop an MP3 here</strong>
+              <p>or choose a file below.</p>
+              <input id="fileInput" type="file" accept=".mp3,audio/mpeg">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="runButton" type="button">Transcribe</button>
+            <button id="clearButton" class="secondary" type="button">Clear</button>
+          </div>
+          <div id="status" class="status" role="status">Waiting for an MP3 and API key.</div>
+          <div id="results" class="downloads" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section id="downloads">
+        <h2>Downloads</h2>
+        <div class="downloads">
+          <div class="download-row">
+            <div>
+              <h3>Latest macOS release</h3>
+              <p>Apple Silicon and Intel builds are attached to each GitHub Release after a version tag finishes building.</p>
+            </div>
+            <a class="button" href="https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker/releases/latest">Open latest release</a>
+          </div>
+          <div class="download-row">
+            <div>
+              <h3>Source and issue tracking</h3>
+              <p>Review the reusable Python engine, desktop app, browser page, and packaging workflow.</p>
+            </div>
+            <a class="button secondary" href="https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker">View repository</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="docs">
+        <h2>Documentation</h2>
+        <div class="doc-grid">
+          <div class="doc-section">
+            <h3>Mac app</h3>
+            <ol>
+              <li>Download the DMG for your Mac architecture.</li>
+              <li>Open the app and paste your ElevenLabs API key.</li>
+              <li>Drop one or more MP3 files, then press Run.</li>
+            </ol>
+          </div>
+          <div class="doc-section">
+            <h3>Outputs</h3>
+            <p>The desktop app writes deliverables beside each source file or into the output folder you choose. The browser version downloads files directly.</p>
+          </div>
+          <div class="doc-section">
+            <h3>Privacy</h3>
+            <p>Audio is uploaded to ElevenLabs for transcription. Verify generated captions before relying on them, especially for published or regulated content.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Unsigned macOS builds require right-click, then Open on first launch. Browser transcription uses the ElevenLabs API from your current tab.</p>
+    </footer>
+    <script src="browser-app.js"></script>
+  </body>
+</html>

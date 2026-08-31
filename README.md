@@ -1,9 +1,10 @@
-# ElevenLabs Helper
+# ElevenLabs Lite Caption Maker
 
 Upload an audio file to **ElevenLabs Speech-to-Text (Scribe)**, monitor a batch
 queue, and collect transcript deliverables (SRT / VTT / DOCX). Ships as a
-lightweight macOS desktop app over a **reusable, headless engine** that also runs
-as a CLI/container for cloud supply-chain workflows (e.g. SDVI Rally).
+lightweight macOS desktop app and a public browser wrapper over a **reusable,
+headless engine** that also runs as a CLI/container for cloud supply-chain
+workflows (e.g. SDVI Rally).
 
 **V1 scope:** you supply a ready-to-upload **`.mp3`** (no conversion). FFmpeg-based
 conversion, video input, segmentation of very long files, and dubbing are on the
@@ -23,6 +24,7 @@ elevenlabs_helper/
     service.py         # Engine facade (store + queue wiring)
   desktop/     # PySide6 GUI — a thin shell that imports the engine
   packaging/   # PyInstaller spec, dmg build, Dockerfile
+  docs/        # GitHub Pages download/docs site + browser caption maker
 ```
 
 The GUI never contains business logic — it drives `engine.service.Engine`. The
@@ -133,6 +135,15 @@ pip install pyinstaller
 ./packaging/build_dmg.sh        # -> dist/ElevenLabs Helper.dmg (+ printed SHA-256)
 ```
 
+For a version-controlled local distribution, use:
+
+```bash
+scripts/release_local.sh 0.1.7
+```
+
+That updates the project version, builds the unsigned DMG, and stores the
+versioned artifact/checksum in `releases/v0.1.7/`.
+
 Builds for the machine's own architecture (Apple Silicon on an M-series Mac,
 Intel on an Intel Mac). A true `universal2` build (`TARGET_ARCH=universal2`)
 requires universal2 wheels for every compiled dependency — notably
@@ -147,15 +158,28 @@ requires universal2 wheels for every compiled dependency — notably
 and attaches both to the GitHub Release:
 
 ```bash
-git init && git add -A && git commit -m "ElevenLabs Helper v0.1.0"
+git init && git add -A && git commit -m "ElevenLabs Helper v0.1.7"
 git remote add origin git@github.com:<you>/<repo>.git && git push -u origin main
-git tag v0.1.0 && git push origin v0.1.0      # triggers the dual-arch build
+git tag v0.1.7 && git push origin v0.1.7      # triggers the dual-arch build
 ```
 
 - **First launch (unsigned):** right-click the app → **Open** to clear Gatekeeper.
 - **Sign + notarize later (optional):** `codesign --deep --options runtime --sign
   "Developer ID Application: …" "dist/ElevenLabs Helper.app"`, then `xcrun
   notarytool submit … --wait` and `xcrun stapler staple`.
+
+## Public page and browser version
+
+GitHub Pages serves the static site from `docs/`. It includes:
+
+- links to the latest GitHub Release downloads;
+- install and privacy documentation;
+- a browser caption maker that calls ElevenLabs directly with the user's pasted
+  API key and downloads SRT, VTT, DOCX, and raw JSON locally.
+
+The browser version is useful for quick jobs, but the desktop app is still the
+recommended path for repeat work because it has a persistent queue, Keychain key
+storage, local transcript history, retries, and free re-export.
 
 ## Cloud / SDVI Rally reuse
 
