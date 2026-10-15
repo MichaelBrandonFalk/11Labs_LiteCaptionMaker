@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from importlib import import_module
+import logging
 import os
 import sys
 from tempfile import TemporaryDirectory
@@ -42,5 +43,6 @@ def main(result_path: str) -> int:
         document.save(output)
         assert Document(output).paragraphs[0].text == "Offline package check"
         window.close()
+        logging.shutdown()
         Path(result_path).write_text("GUI, credential backend, SQLite, and DOCX: OK\n")
     return 0
