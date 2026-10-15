@@ -69,7 +69,7 @@ def main() -> None:
             check=True,
         )
     artifact.with_suffix(artifact.suffix + ".sha256").write_text(
-        f"{sha256(artifact.read_bytes()).hexdigest()}  {artifact.name}\n"
+        f"{sha256(artifact.read_bytes()).hexdigest()}  {artifact.name}\n", newline="\n"
     )
     print(artifact)
 

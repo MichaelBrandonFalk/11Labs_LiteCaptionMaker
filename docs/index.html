@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ElevenLabs Lite Caption Maker</title>
-    <meta name="description" content="Mac app and browser tool for generating SRT, VTT, DOCX, and JSON transcripts with ElevenLabs Scribe.">
+    <meta name="description" content="Windows, Linux Mint, Mac, and browser tools for generating SRT, VTT, DOCX, and JSON transcripts with ElevenLabs Scribe.">
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -28,7 +28,7 @@
           </p>
           <div class="actions">
             <a class="button" href="#browser">Use in browser</a>
-            <a class="button secondary" href="#downloads">Download Mac app</a>
+            <a class="button secondary" href="#downloads">Download desktop app</a>
           </div>
         </div>
         <aside class="hero-panel">
@@ -49,7 +49,7 @@
           <h2>Browser Caption Maker</h2>
           <p>
             This page runs locally in your browser and calls ElevenLabs directly. It does not store your API key.
-            If your browser blocks the direct API request, use the Mac app or CLI release instead.
+            If your browser blocks the direct API request, use the desktop app or CLI release instead.
           </p>
 
           <div class="form-grid">
@@ -101,10 +101,27 @@
 
       <section id="downloads">
         <h2>Downloads</h2>
+        <p>Version 0.1.7. Desktop downloads include Python and the app's dependencies. An ElevenLabs API key is required for transcription.</p>
         <div class="downloads">
           <div class="download-row">
             <div>
-              <h3>Latest macOS release</h3>
+              <h3>Windows</h3>
+              <p>64-bit Windows 10 (1809+) and Windows 11. Extract the entire ZIP, then double-click <code>ElevenLabs Helper.exe</code> inside the extracted folder.</p>
+              <a href="https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker/releases/download/v0.1.7/ElevenLabs-Helper-windows-x86_64.zip.sha256">SHA-256 checksum</a>
+            </div>
+            <a class="button" href="https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker/releases/download/v0.1.7/ElevenLabs-Helper-windows-x86_64.zip">Download Windows ZIP</a>
+          </div>
+          <div class="download-row">
+            <div>
+              <h3>Linux Mint</h3>
+              <p>64-bit Linux Mint 21.x and 22.x (Cinnamon, MATE, or Xfce). Open the DEB in Package Installer, install it, then launch ElevenLabs Lite Caption Maker from the application menu.</p>
+              <a href="https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker/releases/download/v0.1.7/ElevenLabs-Helper-linux-amd64.deb.sha256">SHA-256 checksum</a>
+            </div>
+            <a class="button" href="https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker/releases/download/v0.1.7/ElevenLabs-Helper-linux-amd64.deb">Download Linux Mint DEB</a>
+          </div>
+          <div class="download-row">
+            <div>
+              <h3>macOS</h3>
               <p>Apple Silicon and Intel builds are attached to each GitHub Release after a version tag finishes building.</p>
             </div>
             <a class="button" href="https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker/releases/latest">Open latest release</a>
@@ -123,12 +140,18 @@
         <h2>Documentation</h2>
         <div class="doc-grid">
           <div class="doc-section">
-            <h3>Mac app</h3>
+            <h3>Desktop app</h3>
             <ol>
-              <li>Download the DMG for your Mac architecture.</li>
+              <li>Download and install the package for your operating system.</li>
               <li>Open the app and paste your ElevenLabs API key.</li>
               <li>Drop one or more MP3 files, then press Run.</li>
             </ol>
+          </div>
+          <div class="doc-section">
+            <h3>Windows and Linux Mint</h3>
+            <p>Windows: keep the executable and its <code>_internal</code> folder together after extracting. Builds are unsigned, so Windows may display a publisher warning.</p>
+            <p>Linux Mint: the installer adds required system libraries and GNOME Keyring. Unlock your login keyring in Passwords and Keys if the API key cannot be saved. Mint 20, LMDE, and ARM devices are not supported by this package.</p>
+            <p>For updates, download the newer ZIP or DEB from this page. Your settings and transcript history stay in your user profile.</p>
           </div>
           <div class="doc-section">
             <h3>Outputs</h3>
