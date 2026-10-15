@@ -36,7 +36,10 @@ requires_ffmpeg = pytest.mark.skipif(not _have_ffmpeg(), reason="ffmpeg not inst
 def _isolate_app_dir(tmp_path_factory, monkeypatch):
     """Redirect HOME so app_support_dir() (history, logs, settings) is per-test and
     never touches the real user directory."""
-    monkeypatch.setenv("HOME", str(tmp_path_factory.mktemp("home")))
+    home = str(tmp_path_factory.mktemp("home"))
+    monkeypatch.setenv("HOME", home)
+    monkeypatch.setenv("APPDATA", home)
+    monkeypatch.setenv("XDG_DATA_HOME", home)
 
 
 @pytest.fixture

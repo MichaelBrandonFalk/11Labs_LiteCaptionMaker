@@ -6,7 +6,7 @@ and then made some edits.
 
 Upload an audio file to **ElevenLabs Speech-to-Text (Scribe)**, monitor a batch
 queue, and collect transcript deliverables (SRT / VTT / DOCX). Ships as a
-lightweight macOS desktop app and a public browser wrapper over a **reusable,
+lightweight Windows, Linux Mint, and macOS desktop app and a public browser wrapper over a **reusable,
 headless engine** that also runs as a CLI/container for cloud supply-chain
 workflows (e.g. SDVI Rally).
 
@@ -61,7 +61,8 @@ same engine powers the CLI and the Docker image.
 
 ElevenLabs has **no browser/OAuth login** for its API — only API keys. On first
 run the app links to the ElevenLabs API-keys page and stores your pasted key in
-the **macOS Keychain** (validated against the API on save). Headless/cloud runs
+the **system credential store** (macOS Keychain, Windows Credential Manager, or
+Linux Secret Service / GNOME Keyring; validated against the API on save). Headless/cloud runs
 read `ELEVENLABS_API_KEY` instead.
 
 **Suspected key compromise (rotation runbook):** revoke/rotate the key in the
@@ -157,7 +158,7 @@ requires universal2 wheels for every compiled dependency — notably
 ### Both architectures via CI (recommended)
 
 `.github/workflows/build-macos.yml` builds on **macos-14 (Apple Silicon)** and
-**macos-13 (Intel)** native runners and produces `ElevenLabs-Helper-arm64.dmg` and
+**macos-15-intel (Intel)** native runners and produces `ElevenLabs-Helper-arm64.dmg` and
 `ElevenLabs-Helper-x86_64.dmg` (each with a `.sha256`). It runs on a version tag
 and attaches both to the GitHub Release:
 
@@ -172,6 +173,47 @@ git tag v0.1.7 && git push origin v0.1.7      # triggers the dual-arch build
   "Developer ID Application: …" "dist/ElevenLabs Helper.app"`, then `xcrun
   notarytool submit … --wait` and `xcrun stapler staple`.
 
+## Windows and Linux Mint distributions
+
+Download **v0.1.7** from the [download page](https://michaelbrandonfalk.github.io/11Labs_LiteCaptionMaker/#downloads)
+or [GitHub Release](https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker/releases/tag/v0.1.7).
+Python is bundled; no terminal is needed to install or run these desktop builds.
+
+- **Windows 10 (1809+) / 11, x86_64:** extract the whole
+  `ElevenLabs-Helper-windows-x86_64.zip`, then double-click `ElevenLabs Helper.exe`.
+  Keep the `_internal` folder beside the executable. Builds are unsigned.
+- **Linux Mint 21.x / 22.x, amd64:** open `ElevenLabs-Helper-linux-amd64.deb`
+  in Package Installer, install, then launch **ElevenLabs Lite Caption Maker**
+  from the application menu. The package installs desktop-library dependencies
+  and GNOME Keyring. Unlock the login keyring in **Passwords and Keys** before
+  saving an API key. Mint 20, LMDE, and ARM are outside this package's scope.
+
+To update, replace the extracted Windows folder or install the newer DEB.
+Settings/history are retained in `%APPDATA%/ElevenLabsHelper` on Windows and
+`${XDG_DATA_HOME:-~/.local/share}/ElevenLabsHelper` on Linux.
+Uninstall the DEB through Mint's Software Manager; remove the extracted folder
+on Windows. Neither removes your user data or saved API key.
+
+`.github/workflows/build-desktop.yml` builds natively on Windows Server 2022
+and Ubuntu 22.04 with Python 3.12, PySide6 6.8.3, and PyInstaller 6.16.0. The
+older Linux build baseline supports both Mint 21's Ubuntu 22.04 base and
+Mint 22's Ubuntu 24.04 base. CI runs the engine tests, launches the frozen app,
+checks the GUI, SQLite, credential backend imports, and DOCX resources, and
+installs/launches the DEB on both Ubuntu bases. Checks are offline and spend no
+ElevenLabs credits. Actual Mint desktop/keyring interaction needs a user session.
+Each version tag publishes packages and SHA-256 checksums to its own release.
+
+For a native developer build on Windows or Linux:
+
+```bash
+python -m pip install ".[gui]" "PySide6==6.8.3" "pyinstaller==6.16.0"
+python packaging/build_desktop.py
+```
+
+On Linux, install the desktop libraries listed in the workflow first; DEB
+creation also requires `dpkg-deb`. Build each OS on that OS; PyInstaller does
+not cross-compile. Use `scripts/set_version.py X.Y.Z` before tagging a new release.
+
 ## Public page and browser version
 
 GitHub Pages serves the static site from `docs/`. It includes:
@@ -182,7 +224,7 @@ GitHub Pages serves the static site from `docs/`. It includes:
   API key and downloads SRT, VTT, DOCX, and raw JSON locally.
 
 The browser version is useful for quick jobs, but the desktop app is still the
-recommended path for repeat work because it has a persistent queue, Keychain key
+recommended path for repeat work because it has a persistent queue, system credential
 storage, local transcript history, retries, and free re-export.
 
 ## Cloud / SDVI Rally reuse
@@ -213,5 +255,5 @@ security gate, for regulated use), and V2 capability work below.
 - **Dubbing / Dubbing Studio** (a new `processors/dubbing.py` implementing the
   same `Processor` interface).
 - Optional TXT/JSON/HTML/PDF user-facing exports (JSON already retained),
-  webhook/async transcription, code-signing automation, Windows build.
+  webhook/async transcription, code-signing automation.
 ```

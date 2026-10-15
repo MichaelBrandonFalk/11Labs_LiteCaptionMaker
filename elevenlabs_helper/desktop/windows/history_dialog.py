@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, QUrl
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QDialog,
     QHBoxLayout,
@@ -143,7 +143,7 @@ class HistoryDialog(QDialog):
     def _reveal(self, job: Job) -> None:
         target = Path(job.output_dir)
         if target.exists():
-            subprocess.run(["open", str(target)], check=False)
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(target.resolve())))
         else:
             QMessageBox.information(self, "Folder missing", "The output folder no longer exists.")
 

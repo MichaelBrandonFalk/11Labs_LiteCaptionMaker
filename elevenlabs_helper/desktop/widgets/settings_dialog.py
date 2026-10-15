@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QCheckBox,
     QDialog,
@@ -99,7 +100,9 @@ class SettingsDialog(QDialog):
         store_layout.addWidget(note)
 
         reveal_hist = QPushButton("Reveal history folder")
-        reveal_hist.clicked.connect(lambda: subprocess.run(["open", str(history_dir())], check=False))
+        reveal_hist.clicked.connect(
+            lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(str(history_dir())))
+        )
         store_layout.addWidget(reveal_hist)
         root.addWidget(store_group)
 

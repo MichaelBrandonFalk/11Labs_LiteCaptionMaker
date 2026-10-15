@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QMessageBox
 
 from ..engine.exporters.writer import deliverable_paths
@@ -51,5 +52,5 @@ def reexport_with_prompt(parent, engine, job: Job) -> dict | None:
         QMessageBox.Open | QMessageBox.Ok, QMessageBox.Ok,
     )
     if choice == QMessageBox.Open and Path(out_dir).exists():
-        subprocess.run(["open", str(out_dir)], check=False)
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(Path(out_dir).resolve())))
     return artifacts
