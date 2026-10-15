@@ -8,6 +8,7 @@
 # ship both .dmgs — see README.
 
 import os
+import sys
 from pathlib import Path
 
 from PyInstaller.utils.hooks import collect_data_files
@@ -33,7 +34,12 @@ a = Analysis(
     binaries=binaries,
     datas=datas,
     # keyring's macOS backend and mutagen's mp3 reader are imported lazily.
-    hiddenimports=["keyring.backends.macOS", "mutagen", "mutagen.mp3"],
+    hiddenimports=[
+        {"darwin": "keyring.backends.macOS", "win32": "keyring.backends.Windows"}.get(
+            sys.platform, "keyring.backends.SecretService"
+        ),
+        "mutagen", "mutagen.mp3",
+    ],
     hookspath=[],
     excludes=["tkinter"],
     cipher=block_cipher,
@@ -55,14 +61,15 @@ coll = COLLECT(
     a.datas,
     name="ElevenLabs Helper",
 )
-app = BUNDLE(
-    coll,
-    name="ElevenLabs Helper.app",
-    icon=None,
-    bundle_identifier="com.elevenlabshelper.app",
-    info_plist={
-        "CFBundleShortVersionString": __version__,
-        "CFBundleVersion": __version__,
-        "NSHighResolutionCapable": True,
-    },
-)
+if sys.platform == "darwin":
+    app = BUNDLE(
+        coll,
+        name="ElevenLabs Helper.app",
+        icon=None,
+        bundle_identifier="com.elevenlabshelper.app",
+        info_plist={
+            "CFBundleShortVersionString": __version__,
+            "CFBundleVersion": __version__,
+            "NSHighResolutionCapable": True,
+        },
+    )

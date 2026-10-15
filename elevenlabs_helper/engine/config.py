@@ -50,7 +50,7 @@ def app_support_dir() -> Path:
     """Per-user app data directory (config + SQLite db). macOS-first, with fallbacks."""
     if sys.platform == "darwin":
         base = Path.home() / "Library" / "Application Support" / APP_NAME
-    elif os.name == "nt":  # pragma: no cover - not a target platform yet
+    elif os.name == "nt":  # pragma: no cover - checked in native Windows builds
         base = Path(os.environ.get("APPDATA", Path.home())) / APP_NAME
     else:  # pragma: no cover - linux/containers
         base = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share")) / APP_NAME

@@ -54,8 +54,8 @@ def get_api_key(explicit: str | None = None) -> str:
     key = explicit or os.environ.get(ENV_VAR) or _keyring_get()
     if not key:
         raise MissingApiKeyError(
-            "No ElevenLabs API key found. Add one in Settings (stored in the macOS "
-            f"Keychain) or set the {ENV_VAR} environment variable."
+            "No ElevenLabs API key found. Add one in Settings (stored in your system "
+            f"credential store) or set the {ENV_VAR} environment variable."
         )
     return key.strip()
 

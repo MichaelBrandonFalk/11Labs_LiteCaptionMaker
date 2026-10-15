@@ -1,0 +1,73 @@
+name: Build Windows and Linux apps
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2022
+            platform: Windows x86_64
+          - runner: ubuntu-22.04
+            platform: Linux Mint amd64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Linux build and desktop dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libegl1 libgl1 libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0 gnome-keyring
+      - name: Install Python dependencies
+        run: python -m pip install ".[gui,dev]" "PySide6==6.8.3" "pyinstaller==6.16.0"
+      - name: Test engine and exporters
+        run: python -m pytest -q
+      - name: Build native distribution
+        run: python packaging/build_desktop.py
+      - name: Check packaged Windows app
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Expand-Archive out/ElevenLabs-Helper-windows-x86_64.zip -DestinationPath build/windows-check
+          $result = Join-Path $env:RUNNER_TEMP 'smoke.txt'
+          $exe = Join-Path $PWD 'build/windows-check/ElevenLabs Helper/ElevenLabs Helper.exe'
+          $process = Start-Process -FilePath $exe -ArgumentList '--smoke-test', "`"$result`"" -PassThru
+          if (-not $process.WaitForExit(60000)) { $process.Kill(); throw 'App startup timed out' }
+          if ($process.ExitCode -ne 0 -or -not (Test-Path $result)) { throw 'Packaged app check failed' }
+          Get-Content $result
+      - name: Install and check Linux package (Mint 21 base)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install -y ./out/ElevenLabs-Helper-linux-amd64.deb
+          timeout 60 xvfb-run -a "/opt/elevenlabs-helper/ElevenLabs Helper" --smoke-test "$RUNNER_TEMP/smoke.txt"
+          cat "$RUNNER_TEMP/smoke.txt"
+      - name: Check Linux package on Mint 22 base
+        if: runner.os == 'Linux'
+        run: |
+          docker run --rm -v "$PWD/out:/packages:ro" ubuntu:24.04 bash -euc '
+            apt-get update
+            DEBIAN_FRONTEND=noninteractive apt-get install -y /packages/ElevenLabs-Helper-linux-amd64.deb xvfb
+            timeout 60 xvfb-run -a "/opt/elevenlabs-helper/ElevenLabs Helper" --smoke-test /tmp/smoke.txt
+            cat /tmp/smoke.txt
+          '
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ElevenLabs-Helper-${{ runner.os }}
+          path: out/*
+      - name: Publish verified distributions
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/*

@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import subprocess
 import time
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QColor
+from PySide6.QtCore import Qt, QTimer, QUrl
+from PySide6.QtGui import QColor, QDesktopServices
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -414,7 +413,7 @@ class MainWindow(QMainWindow):
     def _reveal(self, job: Job) -> None:
         target = Path(job.output_dir)
         if target.exists():
-            subprocess.run(["open", str(target)], check=False)
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(target)))
         else:
             self.statusBar().showMessage("No output folder yet for this job.", 4000)
 

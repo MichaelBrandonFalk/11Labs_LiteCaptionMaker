@@ -29,7 +29,7 @@ class KeyDialog(QDialog):
 
         intro = QLabel(
             "ElevenLabs authenticates with a personal API key (there is no browser "
-            "login for the API). Your key is stored securely in the macOS Keychain. "
+            "login for the API). Your key is stored in your system's credential store. "
             "Note: audio extracted from your files is uploaded to ElevenLabs for "
             "transcription."
         )
@@ -87,7 +87,14 @@ class KeyDialog(QDialog):
             self._set_status(message, error=True)
             return
         # "valid" or "unverified" (offline) both persist; unverified shows a soft warning.
-        auth.set_api_key(key)
+        try:
+            auth.set_api_key(key)
+        except Exception:
+            self._set_status(
+                "Could not save your key. Unlock your system credential store "
+                "(Passwords and Keys on Linux Mint), then try again.", error=True
+            )
+            return
         if status == "unverified":
             self._set_status(message + " Saved anyway.", error=False)
         self.accept()
