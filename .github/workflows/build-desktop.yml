@@ -45,8 +45,8 @@ jobs:
           $exe = Join-Path $PWD 'build/windows-check/ElevenLabs Helper/ElevenLabs Helper.exe'
           $process = Start-Process -FilePath $exe -ArgumentList '--smoke-test', "`"$result`"" -PassThru
           if (-not $process.WaitForExit(60000)) { $process.Kill(); throw 'App startup timed out' }
+          if (Test-Path $result) { Get-Content $result }
           if ($process.ExitCode -ne 0 -or -not (Test-Path $result)) { throw 'Packaged app check failed' }
-          Get-Content $result
       - name: Install and check Linux package (Mint 21 base)
         if: runner.os == 'Linux'
         run: |
