@@ -126,6 +126,14 @@ class MainWindow(QMainWindow):
             header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
         layout.addWidget(self.table)
 
+        credit = QLabel(
+            'Forked from <a href="https://github.com/jasonbritton12/11Labs_Helper">'
+            "Jason Britton's 11Labs_Helper</a>."
+        )
+        credit.setWordWrap(True)
+        credit.setOpenExternalLinks(True)
+        layout.addWidget(credit)
+
         # Status bar with permanent output-location indicator (F10)
         self._out_label = QLabel()
         self.statusBar().addPermanentWidget(self._out_label)

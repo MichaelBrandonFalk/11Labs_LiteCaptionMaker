@@ -1,7 +1,6 @@
 # ElevenLabs Lite Caption Maker
 
-Forked Repo from https://github.com/jasonbritton12
-and then made some edits.
+Forked from [Jason Britton's 11Labs_Helper](https://github.com/jasonbritton12/11Labs_Helper).
 
 
 Upload an audio file to **ElevenLabs Speech-to-Text (Scribe)**, monitor a batch
