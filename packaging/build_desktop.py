@@ -52,7 +52,7 @@ def main() -> None:
             "libxcb-xfixes0, libxcb-xinerama0, libxcb-xkb1, gnome-keyring\n"
             "Homepage: https://michaelbrandonfalk.github.io/11Labs_LiteCaptionMaker/\n"
             "Description: ElevenLabs Lite Caption Maker\n"
-            " Desktop MP3 transcription queue with SRT, VTT, and DOCX exports.\n"
+            " Desktop MP3 and WAV transcription queue with SRT, VTT, and DOCX exports.\n"
         )
         applications = stage / "usr" / "share" / "applications"
         applications.mkdir(parents=True)

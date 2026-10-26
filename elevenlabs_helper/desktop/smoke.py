@@ -5,6 +5,7 @@ from importlib import import_module
 import logging
 import os
 import sys
+import wave
 from tempfile import TemporaryDirectory
 
 
@@ -13,6 +14,7 @@ def main(result_path: str) -> int:
     from PySide6.QtWidgets import QApplication
 
     from ..engine.service import Engine
+    from ..engine.media.inspect import inspect
     from .bridge import EngineBridge
     from .widgets.key_dialog import KeyDialog
     from .windows.main_window import MainWindow
@@ -42,7 +44,15 @@ def main(result_path: str) -> int:
         output = Path(temporary) / "check.docx"
         document.save(output)
         assert Document(output).paragraphs[0].text == "Offline package check"
+        wav = Path(temporary) / "check.WAV"
+        with wave.open(str(wav), "wb") as audio:
+            audio.setnchannels(1)
+            audio.setsampwidth(2)
+            audio.setframerate(8000)
+            audio.writeframes(b"\x00\x00" * 8000)
+        assert inspect(wav).duration_secs == 1.0
+        assert window.drop._is_media(str(wav))
         window.close()
         logging.shutdown()
-        Path(result_path).write_text("GUI, credential backend, SQLite, and DOCX: OK\n")
+        Path(result_path).write_text("GUI, credential backend, SQLite, DOCX, and WAV: OK\n")
     return 0

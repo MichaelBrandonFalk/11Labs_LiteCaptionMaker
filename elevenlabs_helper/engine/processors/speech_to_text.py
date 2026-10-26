@@ -1,7 +1,7 @@
 """Speech-to-text processor (V1): upload the user's audio file -> transcribe -> export.
 
 No conversion or segmentation in V1 — the user supplies a ready-to-upload file
-(typically .mp3). Each failure point is classified as permanent (don't retry) or
+(MP3 or WAV). Each failure point is classified as permanent (don't retry) or
 transient (let the queue retry with backoff).
 """
 

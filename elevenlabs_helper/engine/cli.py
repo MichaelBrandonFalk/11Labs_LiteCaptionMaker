@@ -1,6 +1,6 @@
 """Headless CLI — the same engine used by the GUI, runnable in SDVI Rally / containers.
 
-V1 uploads a ready audio file (e.g. .mp3) directly; no conversion.
+V1 uploads ready MP3 or WAV audio directly; no conversion.
 
 Examples:
     elevenlabs-helper transcribe clip.mp3 --out ./out --formats srt,vtt,docx
@@ -144,7 +144,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     t = sub.add_parser("transcribe", help="Transcribe audio files")
-    t.add_argument("inputs", nargs="+", help="Source audio files (e.g. .mp3)")
+    t.add_argument("inputs", nargs="+", help="Source MP3 or WAV audio files")
     t.add_argument("--out", help="Output root dir (default: alongside each source)")
     t.add_argument("--formats", help="Comma list: srt,vtt,docx,json (default from settings)")
     t.add_argument("--language", help="Force language code (default: auto-detect)")

@@ -12,7 +12,7 @@ from pathlib import Path
 
 from ..config import ELEVENLABS_MAX_DURATION_SECS, ELEVENLABS_MAX_FILE_BYTES
 
-SUPPORTED_SUFFIXES = {".mp3"}  # V1 scope; widen on the roadmap
+SUPPORTED_SUFFIXES = {".mp3", ".wav"}
 
 
 @dataclass(frozen=True)

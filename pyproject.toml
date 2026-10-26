@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "elevenlabs-helper"
-version = "0.1.10"
-description = "Transcribe MP3 audio via ElevenLabs Scribe and manage deliverables. Reusable engine and cross-platform desktop GUI."
+version = "0.1.11"
+description = "Transcribe MP3 and WAV audio via ElevenLabs Scribe and manage deliverables. Reusable engine and cross-platform desktop GUI."
 requires-python = ">=3.12,<3.14"
 dependencies = [
     "httpx>=0.27",

@@ -33,12 +33,12 @@ a = Analysis(
     pathex=[str(ROOT)],
     binaries=binaries,
     datas=datas,
-    # keyring's macOS backend and mutagen's mp3 reader are imported lazily.
+    # Credential backends and audio readers are imported lazily.
     hiddenimports=[
         {"darwin": "keyring.backends.macOS", "win32": "keyring.backends.Windows"}.get(
             sys.platform, "keyring.backends.SecretService"
         ),
-        "mutagen", "mutagen.mp3",
+        "mutagen", "mutagen.mp3", "mutagen.wave",
     ],
     hookspath=[],
     excludes=["tkinter"],

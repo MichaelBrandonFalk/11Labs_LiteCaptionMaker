@@ -1,6 +1,6 @@
 # Roadmap
 
-Tracks work intentionally deferred out of V1. V1 (single-`.mp3` → ElevenLabs
+Tracks work intentionally deferred out of V1. V1 (`.mp3` or `.wav` → ElevenLabs
 Scribe → SRT/VTT/DOCX) is built, tested (40 passing), and cleared the engineering
 and UX review gates. Items below are grouped by milestone.
 
@@ -96,7 +96,7 @@ Small, low-risk items from the third review round. None block V1 use.
 
 The original "throw any file at it" vision, plus more ElevenLabs features.
 
-- **FFmpeg conversion module:** accept MOV/MP4/WAV/etc.; transcode to a compact
+- **FFmpeg conversion module:** accept MOV/MP4/etc.; transcode to a compact
   upload audio; show estimated size/duration. (Re-introduces the engine that was
   removed for V1 — keep it behind the same `Processor`/media interface.)
 - **Segmentation + stitching:** split sources beyond the API limits (5 GB / ~10 h)

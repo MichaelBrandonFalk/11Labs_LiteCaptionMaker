@@ -23,7 +23,7 @@
         <div>
           <h1>Make captions with ElevenLabs Scribe without opening Terminal.</h1>
           <p class="lead">
-            Upload a ready-to-use MP3, send it to ElevenLabs Speech-to-Text with your own API key,
+            Upload a ready-to-use MP3 or WAV, send it to ElevenLabs Speech-to-Text with your own API key,
             and collect SRT, VTT, DOCX, and JSON transcript deliverables.
           </p>
           <div class="actions">
@@ -34,7 +34,7 @@
         <aside class="hero-panel">
           <h2>V1 Scope</h2>
           <ul>
-            <li>Ready-to-upload <code>.mp3</code> files only.</li>
+            <li>Ready-to-upload <code>.mp3</code> and <code>.wav</code> audio.</li>
             <li>No FFmpeg conversion or video input yet.</li>
             <li>Sequential desktop queue for repeat local use.</li>
             <li>Browser mode keeps your key in memory only.</li>
@@ -89,9 +89,9 @@
 
           <div id="dropZone" class="drop-zone">
             <div>
-              <strong>Drop an MP3 here</strong>
+              <strong>Drop an MP3 or WAV here</strong>
               <p>or choose a file below.</p>
-              <input id="fileInput" type="file" accept=".mp3,audio/mpeg">
+              <input id="fileInput" type="file" accept=".mp3,.wav,audio/mpeg,audio/wav,audio/x-wav,audio/wave">
             </div>
           </div>
 
@@ -99,7 +99,7 @@
             <button id="runButton" type="button">Transcribe</button>
             <button id="clearButton" class="secondary" type="button">Clear</button>
           </div>
-          <div id="status" class="status" role="status">Waiting for an MP3 and API key.</div>
+          <div id="status" class="status" role="status">Waiting for an MP3 or WAV and API key.</div>
           <div id="results" class="downloads" aria-live="polite"></div>
         </div>
       </section>
@@ -149,7 +149,7 @@
             <ol>
               <li>Download and install the package for your operating system.</li>
               <li>Open the app and paste your ElevenLabs API key.</li>
-              <li>Drop one or more MP3 files, then press Run.</li>
+              <li>Drop one or more MP3 or WAV files, then press Run.</li>
             </ol>
           </div>
           <div class="doc-section">
@@ -174,6 +174,6 @@
       <p>Forked from <a href="https://github.com/jasonbritton12/11Labs_Helper">Jason Britton's 11Labs_Helper</a>.</p>
       <p>Unsigned macOS builds require right-click, then Open on first launch. Browser transcription uses the ElevenLabs API from your current tab.</p>
     </footer>
-    <script src="browser-app.js?v=0.1.10"></script>
+    <script src="browser-app.js?v=0.1.11"></script>
   </body>
 </html>

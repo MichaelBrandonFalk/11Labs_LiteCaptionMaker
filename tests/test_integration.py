@@ -5,6 +5,8 @@ from __future__ import annotations
 import threading
 from pathlib import Path
 
+import pytest
+
 from elevenlabs_helper.engine.config import EngineSettings
 from elevenlabs_helper.engine.jobs.models import JobStatus
 from elevenlabs_helper.engine.jobs.queue import JobQueue
@@ -26,7 +28,9 @@ def _run_to_terminal(queue: JobQueue, job, done_evt):
     assert done_evt.wait(timeout=60), "job did not finish in time"
 
 
-def test_full_pipeline_and_persistence(tmp_path, dummy_mp3, mock_elevenlabs):
+@pytest.mark.parametrize("source_fixture", ["dummy_mp3", "real_wav"])
+def test_full_pipeline_and_persistence(tmp_path, mock_elevenlabs, request, source_fixture):
+    source = request.getfixturevalue(source_fixture)
     settings = _settings(tmp_path)
     db = tmp_path / "jobs.db"
     store = JobStore(db_path=db)
@@ -43,12 +47,14 @@ def test_full_pipeline_and_persistence(tmp_path, dummy_mp3, mock_elevenlabs):
         on_update=on_update,
         api_key_provider=lambda: "test-key",
     )
-    job = make_job(dummy_mp3, settings)
+    job = make_job(source, settings)
     _run_to_terminal(queue, job, done)
     queue.stop()
 
     saved = store.get(job.id)
     assert saved.status == JobStatus.DONE, saved.error
+    assert Path(source).name.encode() in mock_elevenlabs.last_upload
+    assert Path(source).read_bytes() in mock_elevenlabs.last_upload
     out_dir = Path(saved.output_dir)
     assert (out_dir / "sample.srt").exists()
     assert (out_dir / "sample.vtt").exists()

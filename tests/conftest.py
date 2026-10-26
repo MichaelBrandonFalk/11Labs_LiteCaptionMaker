@@ -6,6 +6,7 @@ import json
 import shutil
 import subprocess
 import threading
+import wave
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
@@ -69,6 +70,17 @@ def real_mp3(tmp_path_factory) -> str:
     return str(path)
 
 
+@pytest.fixture
+def real_wav(tmp_path) -> str:
+    path = tmp_path / "sample.WAV"
+    with wave.open(str(path), "wb") as audio:
+        audio.setnchannels(1)
+        audio.setsampwidth(2)
+        audio.setframerate(8000)
+        audio.writeframes(b"\x00\x00" * 16000)
+    return str(path)
+
+
 class _Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):  # silence
         pass
@@ -83,7 +95,7 @@ class _Handler(BaseHTTPRequestHandler):
     def do_POST(self):  # noqa: N802
         server = self.server
         length = int(self.headers.get("Content-Length", 0))
-        self.rfile.read(length)  # drain the multipart upload
+        server.last_upload = self.rfile.read(length)
         server.calls += 1
 
         if not self.headers.get("xi-api-key"):

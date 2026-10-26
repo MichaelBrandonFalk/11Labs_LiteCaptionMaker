@@ -15,7 +15,8 @@ lightweight Windows, Linux Mint, and macOS desktop app and a public browser wrap
 headless engine** that also runs as a CLI/container for cloud supply-chain
 workflows (e.g. SDVI Rally).
 
-**V1 scope:** you supply a ready-to-upload **`.mp3`** (no conversion). FFmpeg-based
+**V1 scope:** you supply a ready-to-upload **`.mp3` or `.wav`** (no conversion). Both
+formats are uploaded unchanged. FFmpeg-based
 conversion, video input, segmentation of very long files, and dubbing are on the
 roadmap (see below).
 
@@ -252,7 +253,7 @@ security gate, for regulated use), and V2 capability work below.
 
 ### Out of scope for V1
 
-- **FFmpeg conversion module:** accept MOV/MP4/WAV/etc., transcode to a compact
+- **FFmpeg conversion module:** accept MOV/MP4/etc., transcode to a compact
   upload, with estimated size/duration.
 - **Segmentation + stitching** of files beyond the API limits (transcribe in
   chunks, re-merge with corrected timecodes).

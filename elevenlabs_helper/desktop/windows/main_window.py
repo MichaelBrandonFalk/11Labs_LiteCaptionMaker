@@ -232,7 +232,7 @@ class MainWindow(QMainWindow):
     def _on_files_rejected(self, count: int) -> None:
         n = f"{count} file{'s' if count != 1 else ''}"
         self.statusBar().showMessage(
-            f"Only .mp3 is supported in this version — export an MP3 first. Ignored {n}.", 8000
+            f"Choose MP3 or WAV audio files. Ignored {n} unsupported file(s).", 8000
         )
 
     # --- table rendering -----------------------------------------------------

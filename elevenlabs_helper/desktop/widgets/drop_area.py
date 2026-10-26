@@ -5,8 +5,7 @@ from __future__ import annotations
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFileDialog, QFrame, QLabel, QPushButton, QVBoxLayout
 
-# V1 scope: a single ready-to-upload .mp3 (conversion + more formats on the roadmap).
-MEDIA_SUFFIXES = {".mp3"}
+from ...engine.media.inspect import SUPPORTED_SUFFIXES
 
 
 class DropArea(QFrame):
@@ -25,7 +24,7 @@ class DropArea(QFrame):
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignCenter)
         label = QLabel(
-            "Drop .mp3 files to stage — then press Run to transcribe\n"
+            "Drop MP3 or WAV files to stage — then press Run to transcribe\n"
             "(export audio first — video & auto-conversion are on the roadmap)"
         )
         label.setAlignment(Qt.AlignCenter)
@@ -51,8 +50,11 @@ class DropArea(QFrame):
     def dropEvent(self, event):  # noqa: N802
         self._set_hover(False)
         dropped = [u.toLocalFile() for u in event.mimeData().urls() if u.isLocalFile()]
-        accepted = [p for p in dropped if self._is_media(p)]
-        rejected = len(dropped) - len(accepted)
+        self._emit_files(dropped)
+
+    def _emit_files(self, paths: list[str]) -> None:
+        accepted = [p for p in paths if self._is_media(p)]
+        rejected = len(paths) - len(accepted)
         if accepted:
             self.filesDropped.emit(accepted)
         if rejected:
@@ -60,13 +62,13 @@ class DropArea(QFrame):
 
     def _browse(self) -> None:
         paths, _ = QFileDialog.getOpenFileNames(
-            self, "Select audio files", "", "Audio (*.mp3);;All files (*)"
+            self, "Select audio files", "", "MP3 and WAV (*.mp3 *.wav *.MP3 *.WAV);;All files (*)"
         )
         if paths:
-            self.filesDropped.emit(paths)
+            self._emit_files(paths)
 
     @staticmethod
     def _is_media(path: str) -> bool:
         from pathlib import Path
 
-        return Path(path).suffix.lower() in MEDIA_SUFFIXES
+        return Path(path).suffix.lower() in SUPPORTED_SUFFIXES

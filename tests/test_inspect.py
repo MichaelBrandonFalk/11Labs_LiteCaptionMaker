@@ -27,6 +27,12 @@ def test_inspect_size_and_unknown_duration(dummy_mp3):
     assert info.duration_secs is None
 
 
+def test_inspect_wav_duration(real_wav):
+    info = inspect(real_wav)
+    assert info.duration_secs == 2.0
+    assert info.size_bytes > 32000
+
+
 def test_limit_warnings_flags_oversize():
     over = MediaInfo(size_bytes=10 * 1024**3, duration_secs=20 * 3600.0)
     warnings = limit_warnings(over)

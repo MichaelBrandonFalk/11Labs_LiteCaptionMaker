@@ -93,9 +93,19 @@ function safeConnectionReason(value, apiKey) {
 }
 
 els.fileInput.addEventListener("change", () => {
-  selectedFile = els.fileInput.files[0] || null;
-  setStatus(selectedFile ? `Ready: ${selectedFile.name}` : "Waiting for an MP3 and API key.");
+  selectAudioFile(els.fileInput.files[0]);
 });
+
+function selectAudioFile(file) {
+  selectedFile = null;
+  if (file && !/\.(mp3|wav)$/i.test(file.name)) {
+    els.fileInput.value = "";
+    setStatus("Choose an MP3 (.mp3) or WAV (.wav) audio file.", "error");
+    return;
+  }
+  selectedFile = file || null;
+  setStatus(selectedFile ? `Ready: ${selectedFile.name}` : "Waiting for an MP3 or WAV and API key.");
+}
 
 for (const eventName of ["dragenter", "dragover"]) {
   els.dropZone.addEventListener(eventName, (event) => {
@@ -112,20 +122,14 @@ for (const eventName of ["dragleave", "drop"]) {
 }
 
 els.dropZone.addEventListener("drop", (event) => {
-  selectedFile = event.dataTransfer.files[0] || null;
-  if (selectedFile && !selectedFile.name.toLowerCase().endsWith(".mp3")) {
-    selectedFile = null;
-    setStatus("Only .mp3 files are supported in V1.", "error");
-    return;
-  }
-  setStatus(selectedFile ? `Ready: ${selectedFile.name}` : "Waiting for an MP3 and API key.");
+  selectAudioFile(event.dataTransfer.files[0]);
 });
 
 els.clearButton.addEventListener("click", () => {
   selectedFile = null;
   els.fileInput.value = "";
   els.results.innerHTML = "";
-  setStatus("Waiting for an MP3 and API key.");
+  setStatus("Waiting for an MP3 or WAV and API key.");
 });
 
 els.runButton.addEventListener("click", async () => {
@@ -135,7 +139,7 @@ els.runButton.addEventListener("click", async () => {
     return;
   }
   if (!selectedFile) {
-    setStatus("Choose or drop an MP3 first.", "error");
+    setStatus("Choose or drop an MP3 or WAV first.", "error");
     return;
   }
   if (!Object.values(els.formats).some((checkbox) => checkbox.checked)) {
@@ -145,13 +149,14 @@ els.runButton.addEventListener("click", async () => {
 
   els.runButton.disabled = true;
   els.testConnectionButton.disabled = true;
+  const sourceFile = selectedFile;
   els.results.innerHTML = "";
   setStatus("Uploading to ElevenLabs. Long files can take several minutes.");
 
   try {
-    const result = await transcribe(selectedFile, apiKey);
+    const result = await transcribe(sourceFile, apiKey);
     const transcript = buildTranscript(result);
-    const stem = selectedFile.name.replace(/\.[^.]+$/, "");
+    const stem = sourceFile.name.replace(/\.[^.]+$/, "");
     const downloads = [];
     if (els.formats.srt.checked) downloads.push(fileDownload(`${stem}.srt`, renderSrt(transcript), "text/plain"));
     if (els.formats.vtt.checked) downloads.push(fileDownload(`${stem}.vtt`, renderVtt(transcript), "text/vtt"));
@@ -160,7 +165,7 @@ els.runButton.addEventListener("click", async () => {
       downloads.push(fileDownload(`${stem}.raw.json`, JSON.stringify(result, null, 2), "application/json"));
     }
     renderDownloads(downloads);
-    setStatus(`Finished ${selectedFile.name}. Download your deliverables below.`, "success");
+    setStatus(`Finished ${sourceFile.name}. Download your deliverables below.`, "success");
   } catch (error) {
     setStatus(friendlyError(error), "error");
   } finally {
