@@ -181,8 +181,8 @@ git tag v0.1.7 && git push origin v0.1.7      # triggers the dual-arch build
 
 ## Windows and Linux Mint distributions
 
-Download **v0.1.10** from the [download page](https://michaelbrandonfalk.github.io/11Labs_LiteCaptionMaker/#downloads)
-or [GitHub Release](https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker/releases/tag/v0.1.10).
+Download **v0.1.11** from the [download page](https://michaelbrandonfalk.github.io/11Labs_LiteCaptionMaker/#downloads)
+or [GitHub Release](https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker/releases/tag/v0.1.11).
 Python is bundled; no terminal is needed to install or run these desktop builds.
 
 - **Windows 10 (1809+) / 11, x86_64:** extract the whole
