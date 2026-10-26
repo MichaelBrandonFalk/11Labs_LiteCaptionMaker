@@ -30,6 +30,7 @@ from ...engine.jobs.models import TERMINAL_STATUSES, Job, JobStatus
 from ...engine.media.inspect import human_duration, human_size, inspect, limit_warnings
 from ...engine.service import Engine
 from ..bridge import EngineBridge
+from ..connection_check import ConnectionCheck
 from ..reexport_action import reexport_with_prompt
 from ..widgets.drop_area import DropArea
 from ..widgets.job_options_dialog import JobOptionsDialog
@@ -52,6 +53,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("ElevenLabs Helper")
         self.resize(860, 580)
+        self._connection_worker = None
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -63,6 +65,7 @@ class MainWindow(QMainWindow):
         settings_btn.clicked.connect(self._open_settings)
         key_btn = QPushButton("API Key")
         key_btn.clicked.connect(self._open_key)
+        self._key_btn = key_btn
         history_btn = QPushButton("History…")
         history_btn.setToolTip("Browse & recover past transcripts (re-export for free)")
         history_btn.clicked.connect(self._open_history)
@@ -95,6 +98,16 @@ class MainWindow(QMainWindow):
         disclosure.setStyleSheet("font-size: 12px;")
         disclosure.setWordWrap(True)
         layout.addWidget(disclosure)
+
+        connection_row = QHBoxLayout()
+        self.test_connection_btn = QPushButton("Test API connection")
+        self.test_connection_btn.setToolTip("Check the saved API key without uploading audio")
+        self.test_connection_btn.clicked.connect(self._test_connection)
+        self.connection_status = QLabel("Not tested.")
+        self.connection_status.setWordWrap(True)
+        connection_row.addWidget(self.test_connection_btn)
+        connection_row.addWidget(self.connection_status, 1)
+        layout.addLayout(connection_row)
 
         # No-key gate banner (F2)
         self.key_banner = QFrame()
@@ -432,7 +445,34 @@ class MainWindow(QMainWindow):
 
     def _open_key(self) -> None:
         KeyDialog(self).exec()
+        self.connection_status.setText("Not tested.")
         self._update_key_state()
+
+    def _test_connection(self) -> None:
+        if self._connection_worker is not None:
+            return
+        try:
+            key = auth.get_api_key()
+        except auth.MissingApiKeyError:
+            self.connection_status.setText("Add your API key first using API Key.")
+            return
+        self.test_connection_btn.setEnabled(False)
+        self._key_btn.setEnabled(False)
+        self.connection_status.setText("Checking ElevenLabs...")
+        worker = ConnectionCheck(key, self)
+        self._connection_worker = worker
+        worker.result.connect(self._connection_result)
+        worker.finished.connect(self._connection_finished)
+        worker.finished.connect(worker.deleteLater)
+        worker.start()
+
+    def _connection_result(self, status: str, message: str) -> None:
+        self.connection_status.setText(message)
+
+    def _connection_finished(self) -> None:
+        self._connection_worker = None
+        self.test_connection_btn.setEnabled(True)
+        self._key_btn.setEnabled(True)
 
     def _update_output_location(self) -> None:
         root = self.engine.settings.output_root
@@ -440,5 +480,7 @@ class MainWindow(QMainWindow):
         self._out_label.setText(f"Output: {where}")
 
     def closeEvent(self, event):  # noqa: N802
+        if self._connection_worker is not None:
+            self._connection_worker.wait()
         self.engine.stop()
         super().closeEvent(event)

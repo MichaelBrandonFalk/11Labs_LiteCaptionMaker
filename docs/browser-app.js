@@ -8,6 +8,8 @@ let selectedFile = null;
 
 const els = {
   apiKey: document.getElementById("apiKey"),
+  testConnectionButton: document.getElementById("testConnectionButton"),
+  connectionStatus: document.getElementById("connectionStatus"),
   language: document.getElementById("language"),
   numSpeakers: document.getElementById("numSpeakers"),
   model: document.getElementById("model"),
@@ -26,6 +28,58 @@ const els = {
     json: document.getElementById("json"),
   },
 };
+
+els.apiKey.addEventListener("input", () => setConnectionStatus("Connection not tested."));
+
+els.testConnectionButton.addEventListener("click", async () => {
+  const apiKey = els.apiKey.value.trim();
+  if (!apiKey) {
+    setConnectionStatus("Add your ElevenLabs API key first.", "error");
+    return;
+  }
+  els.testConnectionButton.disabled = true;
+  els.runButton.disabled = true;
+  els.apiKey.disabled = true;
+  setConnectionStatus("Checking ElevenLabs...");
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  try {
+    const response = await fetch("https://api.elevenlabs.io/v1/user", {
+      headers: { "xi-api-key": apiKey },
+      signal: controller.signal,
+      cache: "no-store",
+    });
+    if (response.status === 200) {
+      setConnectionStatus("Connection successful. API key verified. No audio uploaded.", "success");
+    } else {
+      const body = await response.json().catch(() => ({}));
+      const detail = body.detail?.status || "";
+      if ([401, 403].includes(response.status) && detail === "missing_permissions") {
+        setConnectionStatus("ElevenLabs is reachable; this key is restricted. Speech-to-text permission was not verified.");
+      } else if ([401, 403].includes(response.status)) {
+        setConnectionStatus("ElevenLabs rejected the key or denied access. Check your API key and permissions.", "error");
+      } else if (response.status === 429) {
+        setConnectionStatus("ElevenLabs is rate-limiting requests. Try again shortly.", "error");
+      } else {
+        setConnectionStatus(`Could not verify the connection (HTTP ${response.status}). Try again.`, "error");
+      }
+    }
+  } catch (error) {
+    setConnectionStatus(error.name === "AbortError"
+      ? "Connection check timed out. Check your network and try again."
+      : "Could not reach ElevenLabs. Check your network or use the desktop app if your browser blocks the request.", "error");
+  } finally {
+    clearTimeout(timeout);
+    els.testConnectionButton.disabled = false;
+    els.runButton.disabled = false;
+    els.apiKey.disabled = false;
+  }
+});
+
+function setConnectionStatus(message, kind = "") {
+  els.connectionStatus.textContent = message;
+  els.connectionStatus.className = `status ${kind}`.trim();
+}
 
 els.fileInput.addEventListener("change", () => {
   selectedFile = els.fileInput.files[0] || null;
@@ -79,6 +133,7 @@ els.runButton.addEventListener("click", async () => {
   }
 
   els.runButton.disabled = true;
+  els.testConnectionButton.disabled = true;
   els.results.innerHTML = "";
   setStatus("Uploading to ElevenLabs. Long files can take several minutes.");
 
@@ -99,6 +154,7 @@ els.runButton.addEventListener("click", async () => {
     setStatus(friendlyError(error), "error");
   } finally {
     els.runButton.disabled = false;
+    els.testConnectionButton.disabled = false;
   }
 });
 

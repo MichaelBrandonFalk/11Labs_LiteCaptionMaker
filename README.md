@@ -2,6 +2,12 @@
 
 Forked from [Jason Britton's 11Labs_Helper](https://github.com/jasonbritton12/11Labs_Helper).
 
+Use **Test API connection** in the desktop app or browser tool before running
+a file. The check verifies the saved/pasted key with a lightweight user-info
+request; it uploads no audio and spends no transcription credits. Restricted
+keys may reach ElevenLabs without permission to read user information; the
+result calls out that speech-to-text permission was not verified.
+
 
 Upload an audio file to **ElevenLabs Speech-to-Text (Scribe)**, monitor a batch
 queue, and collect transcript deliverables (SRT / VTT / DOCX). Ships as a
@@ -174,8 +180,8 @@ git tag v0.1.7 && git push origin v0.1.7      # triggers the dual-arch build
 
 ## Windows and Linux Mint distributions
 
-Download **v0.1.7** from the [download page](https://michaelbrandonfalk.github.io/11Labs_LiteCaptionMaker/#downloads)
-or [GitHub Release](https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker/releases/tag/v0.1.7).
+Download **v0.1.8** from the [download page](https://michaelbrandonfalk.github.io/11Labs_LiteCaptionMaker/#downloads)
+or [GitHub Release](https://github.com/MichaelBrandonFalk/11Labs_LiteCaptionMaker/releases/tag/v0.1.8).
 Python is bundled; no terminal is needed to install or run these desktop builds.
 
 - **Windows 10 (1809+) / 11, x86_64:** extract the whole
