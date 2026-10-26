@@ -89,22 +89,28 @@ def validate_key(
         return "unverified", f"Couldn't reach ElevenLabs to verify the key ({exc})."
     if resp.status_code == 200:
         return "valid", "Key verified."
-    if resp.status_code in (401, 403):
-        body = ""
-        try:
-            body = json.dumps(resp.json()).lower()
-        except Exception:
-            body = (resp.text or "").lower()
+    try:
+        payload = resp.json()
+    except ValueError:
+        payload = {}
+    detail = payload.get("detail", payload) if isinstance(payload, dict) else {}
+    code = (detail.get("status") or detail.get("code", "")) if isinstance(detail, dict) else ""
+    reason = detail.get("message", "") if isinstance(detail, dict) else detail
+    reason = reason if isinstance(reason, str) else ""
+    reason = " ".join(reason.replace(api_key.strip(), "[redacted]").split())[:300]
+    if resp.status_code in (400, 401, 403):
         # A definitively bad key reports invalid_api_key — block that.
-        if "invalid_api_key" in body or "could not validate" in body:
+        if code == "invalid_api_key" or "could not validate" in reason.lower():
             return "invalid", "ElevenLabs rejected this key. Check that you copied it correctly."
         # A *scoped* key (e.g. speech-to-text only) authenticates but lacks access to
         # /v1/user (missing_permissions). That key still works for transcription.
-        if "permission" in body:
+        if code == "missing_permissions":
             return "valid", "Key accepted (scoped key — limited to its permitted endpoints)."
         # Anything else ambiguous: don't block a possibly-working key.
-        return "unverified", "Couldn't fully verify the key here; it will be tried on your first job."
-    return "unverified", f"Unexpected response verifying the key (HTTP {resp.status_code})."
+    return "unverified", (
+        f"ElevenLabs rejected the connection check (HTTP {resp.status_code}). "
+        + (reason or "No error explanation was returned.")
+    )
 
 
 def friendly_error(message: str | None) -> str:

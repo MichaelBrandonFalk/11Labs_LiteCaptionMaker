@@ -53,15 +53,19 @@ els.testConnectionButton.addEventListener("click", async () => {
       setConnectionStatus("Connection successful. API key verified. No audio uploaded.", "success");
     } else {
       const body = await response.json().catch(() => ({}));
-      const detail = body.detail?.status || "";
-      if ([401, 403].includes(response.status) && detail === "missing_permissions") {
+      const detail = body.detail && typeof body.detail === "object" ? body.detail : body;
+      const code = detail.status || detail.code || "";
+      const reason = safeConnectionReason(detail.message || (typeof body.detail === "string" ? body.detail : ""), apiKey);
+      if ([400, 401, 403].includes(response.status) && code === "missing_permissions") {
         setConnectionStatus("ElevenLabs is reachable; this key is restricted. Speech-to-text permission was not verified.");
+      } else if ([400, 401, 403].includes(response.status) && code === "invalid_api_key") {
+        setConnectionStatus("ElevenLabs rejected this API key. Copy the full secret key, not the masked preview, and check that it is enabled.", "error");
       } else if ([401, 403].includes(response.status)) {
-        setConnectionStatus("ElevenLabs rejected the key or denied access. Check your API key and permissions.", "error");
+        setConnectionStatus(`ElevenLabs denied access (HTTP ${response.status}). ${reason || "Check your API key and permissions."}`, "error");
       } else if (response.status === 429) {
         setConnectionStatus("ElevenLabs is rate-limiting requests. Try again shortly.", "error");
       } else {
-        setConnectionStatus(`Could not verify the connection (HTTP ${response.status}). Try again.`, "error");
+        setConnectionStatus(`ElevenLabs rejected the connection check (HTTP ${response.status}). ${reason || "No error explanation was returned. Try the desktop connection test to compare."}`, "error");
       }
     }
   } catch (error) {
@@ -79,6 +83,13 @@ els.testConnectionButton.addEventListener("click", async () => {
 function setConnectionStatus(message, kind = "") {
   els.connectionStatus.textContent = message;
   els.connectionStatus.className = `status ${kind}`.trim();
+}
+
+function safeConnectionReason(value, apiKey) {
+  if (typeof value !== "string") return "";
+  return value.split(apiKey).join("[redacted]")
+    .replace(/sk_[A-Za-z0-9_-]+/g, "[redacted]")
+    .replace(/\s+/g, " ").slice(0, 300);
 }
 
 els.fileInput.addEventListener("change", () => {
